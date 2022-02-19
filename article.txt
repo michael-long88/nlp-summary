@@ -1,0 +1,17 @@
+Millions of WordPress sites have received a forced update over the past day to fix a critical vulnerability in a plugin called UpdraftPlus.
+
+The mandatory patch came at the request of UpdraftPlus developers because of the severity of the vulnerability, which allows untrusted subscribers, customers, and others to download the site’s private database as long as they have an account on the vulnerable site. Databases frequently include sensitive information about customers or the site’s security settings, leaving millions of sites susceptible to serious data breaches that spill passwords, user names, IP addresses, and more.
+
+UpdraftPlus simplifies the process of backing up and restoring website databases and is the Internet’s most widely used scheduled backup plugin for the WordPress content management system. It streamlines data backup to Dropbox, Google Drive, Amazon S3, and other cloud services. Its developers say it also allows users to schedule regular backups and is faster and uses fewer server resources than competing WordPress plugins.
+
+“This bug is pretty easy to exploit, with some very bad outcomes if it does get exploited,” said Marc Montpas, the security researcher who discovered the vulnerability and privately reported it to the plugin developers. “It made it possible for low-privilege users to download a site's backups, which include raw database backups. Low-privilege accounts could mean a lot of things. Regular subscribers, customers (on e-commerce sites, for example), etc.”
+
+Montpas, a researcher at website security firm Jetpack Scan, said he found the vulnerability during a security audit of the plugin and provided details to UpdraftPlus developers on Tuesday. A day later, the developers published a fix and agreed to force-install it on WordPress sites that had the plugin installed.
+
+Stats provided by WordPress.org show that 1.7 million sites received the update on Thursday, and more than an additional 287,000 had installed it as of press time. WordPress says the plugin has 3+ million users.
+
+In his own disclosure, Montpas said the vulnerability stemmed from several flaws. The first was in the UpdraftPlus implementation of the WordPress heartbeat function. UpdraftPlus didn’t properly validate that users who sent requests had administrative privileges. That represented a serious problem because the function fetches a list of all active backup jobs and the date of the site’s latest backup. Included in that data is the custom nonce that the plugin used to secure backups.
+
+“An attacker could thus craft a malicious request targeting this heartbeat callback to get access to information about the site’s latest backup to date, which will, among other things, contain a backup’s nonce,” Montpas wrote.
+
+The next weak link was in the maybe_download_backup_from_email function. A variable the function used to validate that users are admins before allowing them to download a backup was vulnerable to hacks that allowed it to be modified by untrusted people.
