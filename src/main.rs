@@ -15,11 +15,7 @@ fn main() {
 
     let sent2score = get_sentence_scores(sentences, &word2count);
 
-    let mut max_val: usize = 0;
-    match word2count.values().max() {
-        Some(val) => max_val = *val,
-        None => ()
-    }
+    let max_val = word2count.values().fold(0.0, |max, &val| if val > max{ val } else{ max });
 
     // created a weighted histogram
     for (_, val) in word2count.iter_mut() {
@@ -31,20 +27,20 @@ fn main() {
 }
 
 /// Score each word based on number of occurances
-fn get_word_scores(word_tokenize: Vec<&str>, stop_words: Vec<&str>) -> HashMap<String, usize> {
-    let mut word2count: HashMap<String, usize> = HashMap::new();
+fn get_word_scores(word_tokenize: Vec<&str>, stop_words: Vec<&str>) -> HashMap<String, f32> {
+    let mut word2count: HashMap<String, f32> = HashMap::new();
     for word in word_tokenize {
         if !stop_words.contains(&word) {
-            let count = word2count.entry(word.to_string()).or_insert(0);
-            *count += 1;
+            let count = word2count.entry(word.to_string()).or_insert(0.);
+            *count += 1.;
         }
     }
     word2count
 }
 
 /// Score each sentence based on word scores
-fn get_sentence_scores(sentences: Vec<&str>, word2count: &HashMap<String, usize>) -> HashMap<String, usize> {
-    let mut sent2score: HashMap<String, usize> = HashMap::new();
+fn get_sentence_scores(sentences: Vec<&str>, word2count: &HashMap<String, f32>) -> HashMap<String, f32> {
+    let mut sent2score: HashMap<String, f32> = HashMap::new();
     for sentence in sentences {
         let words: Vec<_> = sentence.split(" ").into_iter().collect();
         for word in &words {
@@ -52,7 +48,7 @@ fn get_sentence_scores(sentences: Vec<&str>, word2count: &HashMap<String, usize>
                 // only take the sentences that have a minimum of 9 words and a max of 28
                 if words.len() < 28 && words.len() > 9 {
                     if let Some(word_val) = word2count.get(*word) {
-                        let count = sent2score.entry(sentence.to_string()).or_insert(0);
+                        let count = sent2score.entry(sentence.to_string()).or_insert(0.);
                         *count += word_val;
                     }
                 }
@@ -63,10 +59,10 @@ fn get_sentence_scores(sentences: Vec<&str>, word2count: &HashMap<String, usize>
 }
 
 /// Creates a 3 sentence summary from sentence scores
-fn get_summary(sentence_scores: HashMap<String, usize>) -> String {
+fn get_summary(sentence_scores: HashMap<String, f32>) -> String {
     let mut summary_sentences: Vec<&str> = Vec::new();
-    let mut hash_vec: Vec<(&String, &usize)> = sentence_scores.iter().collect();
-    hash_vec.sort_by(|a, b| b.1.cmp(a.1));
+    let mut hash_vec: Vec<(&String, &f32)> = sentence_scores.iter().collect();
+    hash_vec.sort_by(|a, b| b.1.partial_cmp(a.1).unwrap());
     let mut range = 3;
     if hash_vec.len() < range {
         range = hash_vec.len();
