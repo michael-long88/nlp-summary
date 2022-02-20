@@ -9,7 +9,7 @@ fn main() {
 
     let sentences: Vec<_> = separator.split(&contents).into_iter().collect();
     let clean_text = contents.to_lowercase();
-    let word_tokenize: Vec<_> = clean_text.split(" ").collect();
+    let word_tokenize: Vec<_> = clean_text.split(' ').collect();
 
     let mut word2count = get_word_scores(word_tokenize, stop_words);
 
@@ -42,7 +42,7 @@ fn get_word_scores(word_tokenize: Vec<&str>, stop_words: Vec<&str>) -> HashMap<S
 fn get_sentence_scores(sentences: Vec<&str>, word2count: &HashMap<String, f32>) -> HashMap<String, f32> {
     let mut sent2score: HashMap<String, f32> = HashMap::new();
     for sentence in sentences {
-        let words: Vec<_> = sentence.split(" ").into_iter().collect();
+        let words: Vec<_> = sentence.split(' ').into_iter().collect();
         for word in &words {
             if word2count.contains_key(*word) {
                 // only take the sentences that have a minimum of 9 words and a max of 28
@@ -67,8 +67,8 @@ fn get_summary(sentence_scores: HashMap<String, f32>) -> String {
     if hash_vec.len() < range {
         range = hash_vec.len();
     }
-    for i in 0..range {
+    (0..range).for_each(|i| {
         summary_sentences.push(hash_vec[i].0);
-    }
+    });
     summary_sentences.join(". ").replace("\n", "")
 }
